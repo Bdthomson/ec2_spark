@@ -174,7 +174,7 @@ LOCAL$ cat ~/.ssh/id_rsa.pub | ssh datanode2 'cat >> ~/.ssh/authorized_keys'
 LOCAL$ cat ~/.ssh/id_rsa.pub | ssh datanode3 'cat >> ~/.ssh/authorized_keys'
 ```
 
-Now you no longer rely on having the ec2_key.pem file. It is still important to hold onto this key however, in case your computer crashes, you want to give someone else access to the system.
+Now you no longer rely on having the ec2_key.pem file. It is still important to backup this key somewhere, in case you want to give someone else access to the system, or your computer crashes.
 
 ## Hadoop
 
