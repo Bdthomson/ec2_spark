@@ -20,24 +20,39 @@ In this tutorial we will be
 ## Initial Configuration
 ### Creating Instances
 AWS Console > Instances > Launch Instance
+
 1. Choose AMI - Ubuntu Server 14.04 LTS (HVM), SSD Volume Type (Might have to scroll down a bit to find this).
+
 2. Choose an Instance Type - t2.micro is Free tier eligible.
+
 If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
+
 3. Configure Instance Details - Number of Instances = 4
+
 4. Add Storage - 8GB/General Purpose SSD (Default)
+
 5. Tag Instance - Create a key/value pair 'Name': 'newNode' (We will change this in a minute).
+
 6. Configure Security Group - 'Select an existing security group'. There should be two options now, choose 'open' ('open to the world') for now.
+
 7. Review Instance Launch - Launch
-8. You will be asked to choose a pem-key. If this is your first time with Amazon EC2, you probably have no generated one yet. It will generate one for you, and then you can download it to your machine (my key is named ec2_key.pem). (IMPORTANT: You must download this key pair right now. If you do not download at this moment, you will not be able to access your machines, ever.)
+
+8. You will be asked to choose a pem-key. If this is your first time with Amazon EC2, you probably have no generated one yet. It will generate one for you, and then you can download it to your machine (my key is named ec2_key.pem). 
+
+(IMPORTANT: You must download this key pair right now. If you do not download at this moment, you will not be able to access your machines, ever.)
 
 
 
 ### Adjusting Instances
-Now in the Instances tab you should see your 4 nodes, all with the name 'newNode'. Change one of them to namenode, and the other three to datanode1, datanode2, and dataenode3. (When you click on a node, the bottom console populates with details about that node. When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1,2 and 3 by increasing ip).
+Now in the Instances tab you should see your 4 nodes, all with the name 'newNode'. Change one of them to namenode, and the other three to datanode1, datanode2, and dataenode3. (When you click on a node, the bottom console populates with details about that node. 
+    
+When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1,2 and 3 by increasing ip).
 
 ### Important
 
-It is important to note that at certain points, the installation instructions will split into four categories: `LOCAL`, `ALLNODES`, `NAMENODE`, and `DATANODES`. The `LOCAL` identifier will represent your local machine. Things like java need to be installed on all nodes, including the namenode, and will be represented using `ALLNODES` (**This does NOT include your local machine**). However, certain configuration settings only apply to the namenode (`NAMENODE`), and other settings only apply to datanodes (`DATANODES`). 
+It is important to note that at certain points, the installation instructions will split into four categories: `LOCAL`, `ALLNODES`, `NAMENODE`, and `DATANODES`. The `LOCAL` identifier will represent your local machine. 
+
+Things like java need to be installed on all nodes, including the namenode, and will be represented using `ALLNODES` (**This does NOT include your local machine**). However, certain configuration settings only apply to the namenode (`NAMENODE`), and other settings only apply to datanodes (`DATANODES`). 
 
 I will differentiate between them by prepending instructions with identifiers like so:
 
