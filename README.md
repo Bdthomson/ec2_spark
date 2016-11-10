@@ -246,7 +246,7 @@ ALLNODES$ vim $HADOOP_CONF_DIR/core-site.xml
 ```xml
 <configuration>
     <property>
-        <name>fs.defaultFS</name>
+        <name>fs.default.name</name>
         <value>hdfs://NAMENODE_PUBLIC_DNS:54310</value>
     </property>
 </configuration>
