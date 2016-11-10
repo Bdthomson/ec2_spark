@@ -123,7 +123,7 @@ If this is the first time you are accessing this machine, it will ask you if you
 Now exit back out to your local machine. (CTRL-D or type `exit`).
 
 ### Passwordless SSH
-The namenode has to be able to communicate with the datanodes via ssh. For this, we need to set up passwordless SSH.
+The namenode has to be able to communicate with the datanodes via ssh, but it does not have access to the pem key. For this, we need to enable passwordless SSH.
 
 Copy your pem and ssh config files from your local machine to the namenode. We will copy over SSH using `scp`. 
 
