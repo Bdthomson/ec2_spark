@@ -25,28 +25,9 @@ AWS Console > Instances > Launch Instance
 
 2. Choose an Instance Type - t2.micro is Free tier eligible.
 
-   If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
-
-3. Configure Instance Details - Number of Instances = 4
-
-4. Add Storage - 8GB/General Purpose SSD (Default)
-
-5. Tag Instance - Create a key/value pair 'Name': 'newNode' (We will change this in a minute).
-
-6. Configure Security Group - 'Select an existing security group'. There should be two options now, choose 'open' ('open to the world') for now.
-
-7. Review Instance Launch - Launch
-
-8. You will be asked to choose a pem-key. If this is your first time with Amazon EC2, you probably have no generated one yet. It will generate one for you, and then you can download it to your machine (my key is named ec2_key.pem). 
-
-(IMPORTANT: You must download this key pair right now. If you do not download at this moment, you will not be able to access your machines, ever.)
-
-
-
-### Adjusting Instances
-Now in the Instances tab you should see your 4 nodes, all with the name 'newNode'. Change one of them to namenode, and the other three to datanode1, datanode2, and dataenode3. (When you click on a node, the bottom console populates with details about that node. 
+   If you would like an instance type with datanode3. (When you click on a node, the bottom console populates with details about that node. 
     
-When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1,2 and 3 by increasing ip).
+When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1, 2 and 3 by increasing ip).
 
 ### Important
 
@@ -347,19 +328,19 @@ It is best practice to set the value for `dfs.replication` as the number of data
 Now we will remove the old slaves file, then create `masters` and `slaves` files in the hadoop config.
 
 ```bash
-rm $HADOOP_CONF_DIR/slaves
-touch $HADOOP_CONF_DIR/masters $HADOOP_CONF_DIR/slaves
+NAMENODE$ rm $HADOOP_CONF_DIR/slaves
+NAMENODE$ touch $HADOOP_CONF_DIR/masters $HADOOP_CONF_DIR/slaves
 ```
 Let's edit the `masters` file first.
 ```bash
-vim $HADOOP_CONF_DIR/masters
+NAMENODE$ vim $HADOOP_CONF_DIR/masters
 ```
 ```bash
 NAMENODE_HOSTNAME
 ```
 Now the slaves file.
 ```bash
-vim $HADOOP_CONF_DIR/slaves
+NAMENODE$ vim $HADOOP_CONF_DIR/slaves
 ```
 ```bash
 DATANODE1_HOSTNAME
@@ -405,7 +386,7 @@ NAMENODE$ hdfs namenode -format
 ```
 Now start the distributed file system.
 ```bash
-$HADOOP_BASE/sbin/start-dfs.sh
+NAMENODE$ $HADOOP_BASE/sbin/start-dfs.sh
 ```
 
 If it asks about authenticity, this is because the hadoop system has not accessed other nodes via SSH yet. Just hit yes/enter until the questions stop. 
@@ -447,8 +428,8 @@ ALLNODES$ sudo chown -R ubuntu $SPARK_BASE
 Now we will create a spark configuration file from an existing template and open it.
 
 ```bash
-cp $SPARK_BASE/conf/spark-env.sh.template $SPARK_BASE/conf/spark-env.sh
-vim $SPARK_BASE/conf/spark-env.sh
+ALLNODES$ cp $SPARK_BASE/conf/spark-env.sh.template $SPARK_BASE/conf/spark-env.sh
+ALLNODES$ vim $SPARK_BASE/conf/spark-env.sh
 ```
 Edit to look like the following.
 ```bash
