@@ -120,14 +120,6 @@ LOCAL$ ssh namenode
 
 If this is the first time you are accessing this machine, it will ask you if you want to continue, type 'yes' and hit enter.
 
-Quick Note: If you are idle for a bit after SSH'ing into your machine, you probably will get kicked off after a certain period of time. To prevent this from happening, we can set a variable inside of the namenode's ssh settings.
-
-```bash
-NAMENODE$ sudo vim /etc/ssh/sshd_config
-```
-
-In here, add the line `ClientAliveInterval 120`, and  When saving the file, you might get a 'READ ONLY' error. This is to prevent certain files from being changed. This change is fine, use `wq!` to quit. It will force the save.
-
 Now exit back out to your local machine. (CTRL-D or type `exit`).
 
 ### Passwordless SSH
