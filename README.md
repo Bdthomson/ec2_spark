@@ -25,7 +25,7 @@ AWS Console > Instances > Launch Instance
 
 2. Choose an Instance Type - t2.micro is Free tier eligible.
 
-If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
+   If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
 
 3. Configure Instance Details - Number of Instances = 4
 
