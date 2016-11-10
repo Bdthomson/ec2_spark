@@ -14,6 +14,10 @@
 
 [Ganglia](#ganglia)
 
+[Errors](#errors)
+
+[WebUIs](#Webuis)
+
 ## Overview
 In this tutorial we will be 
 
@@ -23,9 +27,15 @@ AWS Console > Instances > Launch Instance
 
 1. Choose AMI - Ubuntu Server 14.04 LTS (HVM), SSD Volume Type (Might have to scroll down a bit to find this).
 
-2. Choose an Instance Type - t2.micro is Free tier eligible.
+2. Choose an Instance Type
 
-   If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
+    t2.micro (1GB RAM) is Free Tier eligible.
+    
+    t2.small (2GB RAM) is not Free Tier eligible, but does provide a boost in ram that is needed for your main machine (the one that will control the datanodes).
+    
+    IMPORTANT: Here, we will create all nodes as micro, and then switch one of them to small afterwards. Creating 4 at a time all at the micro level helps to keep the DNS names together.
+
+    If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
 
 3. Configure Instance Details - Number of Instances = 4
 
@@ -47,6 +57,12 @@ AWS Console > Instances > Launch Instance
 Now in the Instances tab you should see your 4 nodes, all with the name 'newNode'. Change one of them to namenode, and the other three to datanode1, datanode2, and dataenode3. (When you click on a node, the bottom console populates with details about that node. 
     
 When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1,2 and 3 by increasing ip).
+
+IMPORTANT: When you get to end of this guide and have a working Spark environment, the Scala shell that runs on the machine you've now designated as `NAMENODE` will take up a hefty chunk of memory. It is important that you upgrade the namenode to a `t2.small` machine, so that it has 2GB of RAM minimum.
+
+To do this, first select the namenode in the AWS console. With ONLY the namenode selected, go to `Actions > Instante Settings > Change Instance Type`. This will bring up a new window, choose `t2.small` and hit apply. 
+
+Now select all 4 of your machines and select `Actions > Instance State > Start`. You now have 4 working EC2 Instances.
 
 ### Important
 
@@ -239,7 +255,7 @@ ALLNODES$ vim $HADOOP_CONF_DIR/core-site.xml
 <configuration>
     <property>
         <name>fs.default.name</name>
-        <value>hdfs://NAMENODE_PUBLIC_DNS:54310</value>
+        <value>hdfs://NAMENODE_PUBLIC_DNS</value>
     </property>
 </configuration>
 ```
@@ -477,4 +493,84 @@ NAMENODE$ $SPARK_BASE/sbin/start-all.sh
 
 View the SPARK Web UI at NAMENODE_PUBLIC_DNS:8080
 
+### Scala Shell
+Now to test that everything works.
+
+We will be using GeoSpark, a cluster computing system that processes large-scale spatial data. We can get a precompiled GeoSpark JAR file from the [GeoSpark](github.com/DataSystemsLab/GeoSpark/) repo.
+
+```bash
+wget https://github.com/DataSystemsLab/GeoSpark/releases/download/0.3.2/geospark-0.3.2-spark-2.x.jar
+```
+
+Create a directory for third-party jar files in the $SPARK_BASE directory, and place the geospark jar inside of it.
+
+```bash
+NAMENODE$ mkdir $SPARK_BASE/user_jars
+NAMENODE$ mv geospark-* $SPARK_BASE/user_jars/geospark.jar
+```
+
+The command to start the shell involves calling `$SPARK_BASE/bin/spark-shell` with addtional parameters pointing it to both the master node, and giving it access to the geospark jar. Let's create an alias for it to save space.
+
+```bash
+vim ~/.profile
+```
+Go to the bottom of the file and add the alias `start-shell`.
+```bash
+alias start-shell='$SPARK_BASE/bin/spark-shell --jars $SPARK_BASE/user_jars/geospark.jar --master spark://NAMENODE_PUBLIC_DNS:7077'
+```
+
+Let's break down the pieces of this alias.
+`$SPARK_BASE/bin/spark-shell` is calling the Scala-Spark REPL shell.
+
+`--jars` is letting the shell know that we want to start with additional third party jar files, and then we point to the location of `geospark.jar`.
+
+`--master` is letting the shell know the address of a master node so that it can communicate with the node that controls all of the datanodes. In our case, it's the public DNS of our namenode (NAMENODE_PUBLIC_DNS)
+
+Save and exit vim, then source your `~/.profile` so that your new alias is created.
+
+```bash
+source ~/.profile
+```
+
+Now when we run the alias, a scala shell will start up.
+```bash
+ALLNODES$ start-shell
+```
+
+When a scala shell gets created, a new WebUI is available that let's you see the individual jobs running inside of the shell. That WebUI is available at `NAMENODE_PUBLIC_DNS:4040`.
+
+You can load a script using `:load path/to/file_name.scala`
+
+
+If your shell crashes during this part, it is most likely because you ran out of memory on your `NAMENODE`, and picked the 1GB machine at the beginning. Please see [Errors](#errors) for more information.
+
+You can load a script using `:load FILE_NAME`
+
+You can safely exit the shell using `:q`
+
 ## Ganglia
+
+## Errors
+Insufficient Memory
+```bash
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (malloc) failed to allocate 36831232 bytes for committing reserved memory.
+```
+
+This error occurs when you have too many things running on the `NAMENODE` machine. It can typically be fixed by killing all java processes on this machine. (`sudo killall java`). This does however kill hadoop as well, and you will have to restart hadoop.
+
+I have provided scripts that start hadoop from scratch, and loads example csv files into the Hadoop File System in case you wish to stay with a 1GB RAM machine. Your workflow if you wish to stay with a 1GB machine would be to kill all java processes on the `NAMENODE` and then restart hadoop everytime your shell crashes.
+
+This can be cumbersome, and it is probably best to switch to at least a 2GB machine for your `NAMENODE`.
+
+## WebUIs
+
+Now that everything is up and running, there are quite a bit of Web Interfaces that let you monitor the tasks and services you have running, You might want to bookmark them: 
+
+Hadoop - `NAMENODE_PUBLIC_DNS:50070`
+
+Spark Master - `NAMENODE_PUBLIC_DNS:8080`
+
+Spark Jobs - `NAMENODE_PUBLIC_DNS:4040`
+
+Ganglia `NAMENODE_PUBLIC_DNS/ganglia`
