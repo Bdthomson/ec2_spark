@@ -25,9 +25,28 @@ AWS Console > Instances > Launch Instance
 
 2. Choose an Instance Type - t2.micro is Free tier eligible.
 
-   If you would like an instance type with datanode3. (When you click on a node, the bottom console populates with details about that node. 
+   If you would like an instance type with more resources, a price list is available here: http://www.ec2instances.info/
+
+3. Configure Instance Details - Number of Instances = 4
+
+4. Add Storage - 8GB/General Purpose SSD (Default)
+
+5. Tag Instance - Create a key/value pair 'Name': 'newNode' (We will change this in a minute).
+
+6. Configure Security Group - 'Select an existing security group'. There should be two options now, choose 'open' ('open to the world') for now.
+
+7. Review Instance Launch - Launch
+
+8. You will be asked to choose a pem-key. If this is your first time with Amazon EC2, you probably have no generated one yet. It will generate one for you, and then you can download it to your machine (my key is named ec2_key.pem). 
+
+(IMPORTANT: You must download this key pair right now. If you do not download at this moment, you will not be able to access your machines, ever.)
+
+
+
+### Adjusting Instances
+Now in the Instances tab you should see your 4 nodes, all with the name 'newNode'. Change one of them to namenode, and the other three to datanode1, datanode2, and dataenode3. (When you click on a node, the bottom console populates with details about that node. 
     
-When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1, 2 and 3 by increasing ip).
+When spawning multiple nodes, the private ip addresses of my nodes have always been next to eachother (i.e. 60, 61, 62, and 63). It might be convenient if you name the lowest one namenode, and the rest datanode1,2 and 3 by increasing ip).
 
 ### Important
 
@@ -451,7 +470,7 @@ NAMENODE$ cp $SPARK_BASE/conf/slaves.template $SPARK_BASE/conf/slaves
 
 Open it, go to the bottom, make sure to delete the line with `localhost`. Add the following.
 ```bash
-vim $SPARK_BASE/conf/slaves
+NAMENODE$ vim $SPARK_BASE/conf/slaves
 ```
 ```bash
 DATANODE1_PUBLIC_DNS
@@ -461,7 +480,7 @@ DATANODE3_PUBLIC_DNS
 
 Now you can start all worker nodes with the following command.
 ```bash
-$SPARK_BASE/sbin/start-all.sh
+NAMENODE$ $SPARK_BASE/sbin/start-all.sh
 ```
 
 View the SPARK Web UI at NAMENODE_PUBLIC_DNS:8080
