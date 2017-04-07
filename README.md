@@ -19,7 +19,7 @@
 [WebUIs](#Webuis)
 
 ## Overview
-In this tutorial we will be 
+After setting this up from scratch quite a few times for school projects, I figured I would write up a complete guide in hopes of helping others get started.
 
 ## Initial Configuration
 ### Creating Instances
